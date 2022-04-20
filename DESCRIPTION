@@ -1,0 +1,11 @@
+Package: clusterTALYSmpi
+Type: Package
+Title: TALYS Calculations in Parallel on Cluster using mpi interface
+Version: 0.1.0
+Author: Alf Göök
+Maintainer: Alf Göök <alf.gook@physics.uu.se>
+Description: This package is based on the original package clusterTALYS by Georg Schnabel. It replaces the original implementation based on maintaining an ssh connection with the cluster with an MPI interface to start talys.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
