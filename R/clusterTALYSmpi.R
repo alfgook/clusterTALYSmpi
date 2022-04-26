@@ -36,6 +36,10 @@
 #' @import data.table
 initClusterTALYSmpi <- function(talysExe, runOpts=NULL) {
 
+  # will need to resolve this, should not have to specify a complete path to the .so file
+  dyn.load(paste0("/home/alf/programs/talys-mpi/runTALYSmpi/start_mpi_workers", .Platform$dynlib.ext))
+  .C("initalize_mpi")
+
   defaults <- list(runOpts=runOpts)
   theResults <- NA
 
@@ -113,16 +117,20 @@ initClusterTALYSmpi <- function(talysExe, runOpts=NULL) {
     }
 
     #create the command string
-    nbrCPU <- 4 # I need to figure out where to take this from
-    cmdstr <- paste0("mpirun -np ", nbrCPU, " runTALYSmpi ", do.call(paste,jobList))
-    print(cmdstr)
-    print("---------------")
+    #nbrCPU <- 32 # I need to figure out where to take this from
+    #.C("start_mpi_workers",as.integer(nbrCPU),as.character("runTALYSmpi"),as.character(do.call(paste,jobList)));
+    #directories <- do.call(paste,jobList)
 
     #run the jobs
-    system(cmdstr)
+    base_wd <- getwd()
+    setwd("/home/alf/programs/talys-mpi/runTALYSmpi")
+    .C("start_mpi_workers",
+        worker_program = as.character("runTALYSmpi"),
+        job_list = as.character(jobList),
+        number_of_jobs = as.integer(length(jobList)),
+        number_of_workers = as.integer(length(jobList)));
 
     #get the results
-    base_wd <- getwd()
     resultList <- replicate(length(input),NULL,simplify=FALSE)
     for (jobIdx in seq_along(input)) {
       #resultList[[jobIdx]] <- readResults(inputList[[jobIdx]])
@@ -146,7 +154,7 @@ initClusterTALYSmpi <- function(talysExe, runOpts=NULL) {
 
       # handle errors gracefully
       dummyFun <- function() {
-        talysMod$finalize(input[[jobIdx]]$calcDir)
+        #talysMod$finalize(input[[jobIdx]]$calcDir)
         talysMod$read(input[[jobIdx]]$calcDir, copy(input[[jobIdx]]$outspec), packed=FALSE)
       }
       curRes <- tryCatch(withCallingHandlers(dummyFun(),
@@ -173,6 +181,7 @@ initClusterTALYSmpi <- function(talysExe, runOpts=NULL) {
       }
 
       unlink(list.files(input[[jobIdx]]$calcDir))
+      unlink(input[[jobIdx]]$calcDir, recursive=TRUE)
     }
     # delete the temporary calculation directory
     unlink(basedir, recursive=TRUE)
@@ -211,5 +220,9 @@ initClusterTALYSmpi <- function(talysExe, runOpts=NULL) {
       runStatus
   }
 
-  list(run=runTALYS,result=getResults,isRunning=isRunningTALYS)
+  close <- function() {
+    .C("finalize_mpi")
+  }
+
+  list(run=runTALYS,result=getResults,isRunning=isRunningTALYS,close=close)
 }
