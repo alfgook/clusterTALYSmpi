@@ -34,10 +34,14 @@
 #' @export
 #'
 #' @import data.table
-initClusterTALYSmpi <- function(talysExe, runOpts=NULL) {
+#' @useDynLib clusterTALYSmpi initalize_mpi
+#' @useDynLib clusterTALYSmpi finalize_mpi
+#' @useDynLib clusterTALYSmpi start_mpi_workers
+
+initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
 
   # will need to resolve this, should not have to specify a complete path to the .so file
-  dyn.load(paste0("/home/alf/programs/talys-mpi/runTALYSmpi/start_mpi_workers", .Platform$dynlib.ext))
+  #dyn.load(paste0("/home/alf/programs/talys-mpi/runTALYSmpi/start_mpi_workers", .Platform$dynlib.ext))
   .C("initalize_mpi")
 
   defaults <- list(runOpts=runOpts)
@@ -123,12 +127,15 @@ initClusterTALYSmpi <- function(talysExe, runOpts=NULL) {
 
     #run the jobs
     base_wd <- getwd()
-    setwd("/home/alf/programs/talys-mpi/runTALYSmpi")
+    #setwd("/home/alf/programs/talys-mpi/runTALYSmpi")
+    if(!("bindir" %in% names(runOpts))) bin_path <- runOpts$bindir
     .C("start_mpi_workers",
         worker_program = as.character("runTALYSmpi"),
         job_list = as.character(jobList),
         number_of_jobs = as.integer(length(jobList)),
-        number_of_workers = as.integer(length(jobList)));
+        number_of_workers = as.integer(length(jobList)),
+        talys_exe = as.character(talysExe),
+        bin_path = as.character(bin_path));
 
     #get the results
     resultList <- replicate(length(input),NULL,simplify=FALSE)
