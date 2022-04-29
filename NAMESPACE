@@ -1,0 +1,8 @@
+# Import required packages
+# none so far
+# Load dynamic libraries (shared object files)
+# useDynLib(clusterTALYSmpi)
+# Export functions defined in R code
+
+export(initClusterTALYSmpi)
+useDynLib(clusterTALYSmpi,initalize_mpi,finalize_mpi,start_mpi_workers)

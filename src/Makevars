@@ -1,0 +1,4 @@
+export MPI_CPPFLAGS=$(shell mpicc -showme:compile)
+export MPI_LDFLAGS=$(shell mpicc -showme:link)
+PKG_CFLAGS = $(MPI_CPPFLAGS)
+PKG_LIBS = $(MPI_LDFLAGS)
