@@ -44,6 +44,10 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
   #dyn.load(paste0("/home/alf/programs/talys-mpi/runTALYSmpi/start_mpi_workers", .Platform$dynlib.ext))
   .C("initalize_mpi")
 
+  .Last() <- function() {
+    .C("finalize_mpi")
+  }
+
   defaults <- list(runOpts=runOpts)
   theResults <- NA
 
@@ -133,7 +137,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
     } else {
       bin_path <- "/usr/local/bin"
     }
-    
+
     .C("start_mpi_workers",
         worker_program = as.character("runTALYSmpi"),
         job_list = as.character(jobList),
