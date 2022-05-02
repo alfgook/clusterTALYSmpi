@@ -38,7 +38,7 @@
 #' @useDynLib clusterTALYSmpi finalize_mpi
 #' @useDynLib clusterTALYSmpi start_mpi_workers
 
-initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
+initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=1048576) {
 
   # will need to resolve this, should not have to specify a complete path to the .so file
   #dyn.load(paste0("/home/alf/programs/talys-mpi/runTALYSmpi/start_mpi_workers", .Platform$dynlib.ext))
@@ -53,8 +53,6 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
 
   defaults <- list(runOpts=runOpts)
   theResults <- NA
-
-  stopifnot(("maxNumCPU" %in% names(runOpts)),is.numeric(runOpts$maxNumCPU))
 
   runTALYS <- function(inpSpecList, outSpec, runOpts=NULL, saveDir=NULL) {
 
@@ -141,12 +139,6 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
       bin_path <- runOpts$bindir
     } else {
       bin_path <- "/usr/local/bin"
-    }
-
-    if(("maxNumCPU" %in% names(runOpts))) {
-      maxNumCPU <- runOpts$bindir
-    } else {
-      maxNumCPU <- length(jobList)
     }
 
     .C("start_mpi_workers",
@@ -253,10 +245,9 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
       stop(paste0("outSpec must be either a datatable or ",
                   "a list of datatables of the same length as inpSpecList"))
 
-      if (is.null(runOpts))
-      runOpts <- defaults$runOpts
+      if (is.null(runOpts)) runOpts <- defaults$runOpts
 
-      if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<runOpts$maxNumCPU ) ) { # single job
+      if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<maxNumCPU ) ) { # single job
         print("single job")
         print(inpSpecList)
         print("---------")
@@ -266,8 +257,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
       } else if (is.list(outSpec)) {
         # split requested calculations into several jobs
         print("split job")
-        InpChunks <- split(inpSpecList, ceiling(seq_along(lst)/runOpts$maxNumCPU))
-        outChunks <- split(outSpec, ceiling(seq_along(lst)/runOpts$maxNumCPU))
+        InpChunks <- split(inpSpecList, ceiling(seq_along(lst)/maxNumCPU))
+        outChunks <- split(outSpec, ceiling(seq_along(lst)/maxNumCPU))
         jobList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
           #jobList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts)
@@ -280,5 +271,5 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
       jobList
   }
 
-  list(run=runTALYS,result=getResults,isRunning=isRunningTALYS,close=close)
+  list(run=splitJob,result=getResults,isRunning=isRunningTALYS,close=close)
 }
