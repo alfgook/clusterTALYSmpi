@@ -44,7 +44,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
   #dyn.load(paste0("/home/alf/programs/talys-mpi/runTALYSmpi/start_mpi_workers", .Platform$dynlib.ext))
   .C("initalize_mpi")
 
-  .Last() <- function() {
+  .Last <- function() {
     .C("finalize_mpi")
   }
 
