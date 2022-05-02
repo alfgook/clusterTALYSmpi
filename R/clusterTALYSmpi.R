@@ -249,9 +249,6 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=104857
 
       if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<maxNumCPU ) ) { # single job
         print("single job")
-        print(inpSpecList)
-        print("---------")
-        print(outSpec)
         #jobList <- runTALYS(inpSpecList,outSpec,runOpts=runOpts, saveDir=saveDir)
         jobList <- runTALYS(inpSpecList,outSpec)
       } else if (is.list(outSpec)) {
