@@ -54,6 +54,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
   defaults <- list(runOpts=runOpts)
   theResults <- NA
 
+  stopifnot(("maxNumCPU" %in% names(runOpts)),is.numeric(runOpts$maxNumCPU))
+
   runTALYS <- function(inpSpecList, outSpec, runOpts=NULL, calcsPerJob=NULL, pollTime=0, saveDir=NULL) {
 
     if (!is.list(inpSpecList) || !all(sapply(inpSpecList, is.list)))
@@ -140,7 +142,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
     } else {
       bin_path <- "/usr/local/bin"
     }
-    
+
     if(("maxNumCPU" %in% names(runOpts))) {
       maxNumCPU <- runOpts$bindir
     } else {
@@ -224,9 +226,6 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
 
   getResults <- function(jobList, selection=TRUE) {
     return(theResults)
-
-    # this function will need to be extended to get a specifc calculation result
-    # for the jacobian calculation 
   }
 
   isRunningTALYS <- function(jobList,combine=TRUE) {
@@ -245,5 +244,38 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
       runStatus
   }
 
-  list(run=runTALYS,result=getResults,isRunning=isRunningTALYS,close=close)
+  splitJob <- function(inpSpecList, outSpec, runOpts=NULL, calcsPerJob=NULL, pollTime=0, saveDir=NULL) {
+    if (!is.list(inpSpecList) || !all(sapply(inpSpecList, is.list)))
+      stop("inpSpecList must be a list of TALYS inputs")
+    if (!is.data.table(outSpec) && !(is.list(outSpec) &&
+                                    all(sapply(outSpec, is.data.table)) &&
+                                    length(inpSpecList) == length(outSpec)))
+      stop(paste0("outSpec must be either a datatable or ",
+                  "a list of datatables of the same length as inpSpecList"))
+
+      if (is.null(runOpts))
+      runOpts <- defaults$runOpts
+
+      if (is.data.table(outSpec) || (is.list(outSpec) && length(outSpec)<runOpts$maxNumCPU) ) { # single job
+        jobList <- runTALYS(inpSpecList,outSpec,runOpts=runOpts)
+      } else if (is.list(outSpec)) {
+        # split requested calculations into several jobs
+        InpChunks <- split(inpSpecList, ceiling(seq_along(lst)/runOpts$maxNumCPU))
+        outChunks <- split(outSpec, ceiling(seq_along(lst)/runOpts$maxNumCPU))
+      } else {
+        stop("should not happen")
+      }
+
+      inputList <- split(input,groupfact)
+      # start the jobs
+      jobList <- replicate(length(inputList),NULL,simplify=FALSE)
+      for (jobIdx in seq_along(inputList)) {
+        jobList[[jobIdx]] <- runTALYS(inputList[[jobIdx]],runOpts=runOpts)
+        runTALYS <- function(inpSpecList, outSpec, runOpts=NULL, calcsPerJob=NULL, pollTime=0, saveDir=NULL)
+      }
+
+      jobList
+  }
+
+  list(run=splitJob,result=getResults,isRunning=isRunningTALYS,close=close)
 }
