@@ -262,16 +262,12 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
         # split requested calculations into several jobs
         InpChunks <- split(inpSpecList, ceiling(seq_along(lst)/runOpts$maxNumCPU))
         outChunks <- split(outSpec, ceiling(seq_along(lst)/runOpts$maxNumCPU))
+        jobList <- replicate(length(InpChunks),NULL,simplify=FALSE)
+        for (jobIdx in seq_along(InpChunks)) {
+          jobList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts)
+        }
       } else {
         stop("should not happen")
-      }
-
-      inputList <- split(input,groupfact)
-      # start the jobs
-      jobList <- replicate(length(inputList),NULL,simplify=FALSE)
-      for (jobIdx in seq_along(inputList)) {
-        jobList[[jobIdx]] <- runTALYS(inputList[[jobIdx]],runOpts=runOpts)
-        runTALYS <- function(inpSpecList, outSpec, runOpts=NULL, calcsPerJob=NULL, pollTime=0, saveDir=NULL)
       }
 
       jobList
