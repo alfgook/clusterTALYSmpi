@@ -280,5 +280,5 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
       jobList
   }
 
-  list(run=splitJob,result=getResults,isRunning=isRunningTALYS,close=close)
+  list(run=runTALYS,result=getResults,isRunning=isRunningTALYS,close=close)
 }
