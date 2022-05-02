@@ -68,6 +68,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=104857
     library(TALYSeval)
     library(data.table)
 
+    print("runTALYS")
+
     # error handling
     stackvarname <- paste0("stackinfo_",paste0(sample(letters, 10), collapse=""))
     conditionFun <- function(cond) {
@@ -254,8 +256,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=104857
       } else if (is.list(outSpec)) {
         # split requested calculations into several jobs
         print("split job")
-        InpChunks <- split(inpSpecList, ceiling(seq_along(lst)/maxNumCPU))
-        outChunks <- split(outSpec, ceiling(seq_along(lst)/maxNumCPU))
+        InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
+        outChunks <- split(outSpec, ceiling(seq_along(outSpec)/maxNumCPU))
         jobList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
           #jobList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts)
