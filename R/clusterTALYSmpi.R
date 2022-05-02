@@ -129,6 +129,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
     base_wd <- getwd()
     #setwd("/home/alf/programs/talys-mpi/runTALYSmpi")
     if(!("bindir" %in% names(runOpts))) bin_path <- runOpts$bindir
+    print(talysExe)
+    print(bin_path)
     .C("start_mpi_workers",
         worker_program = as.character("runTALYSmpi"),
         job_list = as.character(jobList),
