@@ -62,6 +62,7 @@ int start_mpi_workers(const char **worker_program ,
    }
 
    nbr_of_workers = MIN(nbr_of_workers,universe_size-1);
+   nbr_of_workers = MIN(nbr_of_workers,nbr_of_jobs);
    //printf("nbr_of_workers = %d\n",nbr_of_workers);
    //printf("nbr_of_jobs = %d\n",nbr_of_jobs);
    //printf("universe_size = %d\n",universe_size);
