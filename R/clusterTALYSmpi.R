@@ -134,18 +134,24 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
 
     #run the jobs
     base_wd <- getwd()
-    #setwd("/home/alf/programs/talys-mpi/runTALYSmpi")
+
     if(("bindir" %in% names(runOpts))) {
       bin_path <- runOpts$bindir
     } else {
       bin_path <- "/usr/local/bin"
+    }
+    
+    if(("maxNumCPU" %in% names(runOpts))) {
+      maxNumCPU <- runOpts$bindir
+    } else {
+      maxNumCPU <- length(jobList)
     }
 
     .C("start_mpi_workers",
         worker_program = as.character("runTALYSmpi"),
         job_list = as.character(jobList),
         number_of_jobs = as.integer(length(jobList)),
-        number_of_workers = as.integer(length(jobList)),
+        number_of_workers = as.integer(maxNumCPU),
         talys_exe = as.character(talysExe),
         bin_path = as.character(bin_path));
 
