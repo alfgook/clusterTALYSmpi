@@ -111,7 +111,7 @@ int start_mpi_workers(const char **worker_program ,
    // I need to add a wait for the workers to finish thier tasks here!!!
    //MPI_Barrier(everyone);
 
-   printf("workers spawned... waiting...\n");
+   printf("%d workers spawned... waiting...\n",nbr_of_workers);
    for(int worker=0;worker<nbr_of_workers;worker++) {
       int rank;
       MPI_Recv(&rank, 1, MPI_INT, worker, 0, everyone, MPI_STATUS_IGNORE);

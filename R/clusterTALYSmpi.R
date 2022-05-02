@@ -133,8 +133,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
     } else {
       bin_path <- "/usr/local/bin"
     }
-    print(talysExe)
-    print(bin_path)
+    
     .C("start_mpi_workers",
         worker_program = as.character("runTALYSmpi"),
         job_list = as.character(jobList),
