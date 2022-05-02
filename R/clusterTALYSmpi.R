@@ -49,7 +49,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL) {
   }
 
   ee <- environment()
-  reg.finalizer(ee, close(), onexit = TRUE)
+  reg.finalizer(ee, close, onexit = TRUE)
 
   defaults <- list(runOpts=runOpts)
   theResults <- NA
