@@ -216,7 +216,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
     stopifnot(isTRUE(selection == TRUE) || is.numeric(selection))
 
     if(isTRUE(selection)) {
-      unlist(theResults)
+      unlist(theResults,recursive=FALSE)
     }
 
   }
