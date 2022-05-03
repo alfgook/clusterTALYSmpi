@@ -232,7 +232,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
     }
 
     if(isTRUE(selection)) {
-      print(theResults[[1]]$result)
+      #print(theResults[[1]]$result)
+      print(theResults)
       unlist(theResults,recursive=FALSE)
     }
 
