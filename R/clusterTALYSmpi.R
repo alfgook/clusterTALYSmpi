@@ -40,12 +40,11 @@
 
 initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 
-  # will need to resolve this, should not have to specify a complete path to the .so file
-  #dyn.load(paste0("/home/alf/programs/talys-mpi/runTALYSmpi/start_mpi_workers", .Platform$dynlib.ext))
+  # initalize mpi and get the number of availible workers
+  # modify the user supplied number of workers to not be larger
+  # than the number of availible workers. If the user supplied 
+  # number of workers is 0 (default) use all availible workers
   retval=.C("initalize_mpi",maxNumWorkers = as.integer(maxNumCPU))
-  print("--maxNumWorkers--")
-  print(retval$maxNumWorkers)
-  print("-----------------")
   if( maxNumCPU > 0 ) {
     maxNumCPU <- min(retval$maxNumWorkers,maxNumCPU)
   } else {
@@ -137,11 +136,6 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       input[[jobIdx]]$calcDir <- basedir
     }
 
-    #create the command string
-    #nbrCPU <- 32 # I need to figure out where to take this from
-    #.C("start_mpi_workers",as.integer(nbrCPU),as.character("runTALYSmpi"),as.character(do.call(paste,jobList)));
-    #directories <- do.call(paste,jobList)
-
     #run the jobs
     base_wd <- getwd()
 
@@ -217,14 +211,6 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 
     setwd(base_wd)
     resultList
-    #theResults <<- resultList
-    #jobList
-
-    # it would make more sense, and be simpler to just return the result here,
-    # but to be compatible with Georgs clusterTalys.R the result will be returned
-    # from the getResults function. This is so I can use the same controlling 
-    # scripts for both the present clusterTALYSmpi and the original clusterTALYS codes.
-    # All that is needed is to change the TalysHnd in the config file
   }
 
   getResults <- function(jobList, selection=TRUE) {
@@ -277,6 +263,14 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       }
 
       theResults <<- resultList
+
+      # it would make more sense, and be simpler to just return the result here,
+      # but to be compatible with Georgs clusterTalys.R the result will be returned
+      # from the getResults function. This is so I can use the same controlling 
+      # scripts for both the present clusterTALYSmpi and the original clusterTALYS codes.
+      # All that is needed is to change the TalysHnd in the config file
+
+      resultList
   }
 
   list(run=splitJob,result=getResults,isRunning=isRunningTALYS,close=close)
