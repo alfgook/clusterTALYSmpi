@@ -46,7 +46,7 @@ void start_mpi_workers(const char **worker_program ,
 
    if (world_size != 1) {
       printf("Top heavy with management");
-      return 1;
+      return;
    }
 
    //MPI_Attr_get(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &universe_sizep, &flag);
@@ -54,7 +54,7 @@ void start_mpi_workers(const char **worker_program ,
 
    if (!flag) { 
       printf("This MPI does not support UNIVERSE_SIZE."); 
-      return 1;
+      return;
    } else {
       universe_size = *universe_sizep;
    }
@@ -62,7 +62,7 @@ void start_mpi_workers(const char **worker_program ,
    //printf("universe_size = %d\n",universe_size);
    if (universe_size == 1) {
       printf("No room to start workers");
-      return 1;
+      return;
    }
 
    if(nbr_of_workers>0) {
