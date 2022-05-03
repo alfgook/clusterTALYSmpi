@@ -289,6 +289,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 #        stop("should not happen")
 #      }
 
+      if(is.data.table(outSpec)) print("is.data.table(outSpec)")
+
       print("--- splitting job ----")
       # split requested calculations into several jobs
       InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
