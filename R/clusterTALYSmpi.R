@@ -224,6 +224,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
     print("-----------------")
 
     if(length(theResults)==1) {
+      print(theResults$result)
       return(theResults)
     }
 
