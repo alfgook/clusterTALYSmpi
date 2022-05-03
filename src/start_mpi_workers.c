@@ -5,7 +5,7 @@
 
 #define MIN(x,y) ((x<y)?x:y)
 
-int initalize_mpi(int *number_of_workers) {
+void initalize_mpi(int *number_of_workers) {
    int world_size,flag;
 
    MPI_Init(NULL, NULL);
@@ -14,10 +14,9 @@ int initalize_mpi(int *number_of_workers) {
    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
    MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &number_of_workers, &flag);
    printf("number_of_workers = %d\n",*number_of_workers);
-   return 0;
 }
 
-int finalize_mpi() {
+void finalize_mpi() {
    printf("finalize_mpi is called...\n");
    int init_flag;
    MPI_Initialized(&init_flag);
@@ -25,10 +24,9 @@ int finalize_mpi() {
       MPI_Finalize();
       printf("the mpi session has been finalized\n");
    }
-   return 0;
 }
 
-int start_mpi_workers(const char **worker_program ,
+void start_mpi_workers(const char **worker_program ,
                         char *job_list[],
                         const int *number_of_jobs,
                         const int *number_of_workers,
@@ -135,5 +133,4 @@ int start_mpi_workers(const char **worker_program ,
 
    printf("all done!\n");
    //MPI_Finalize();
-   return 0; 
 } 
