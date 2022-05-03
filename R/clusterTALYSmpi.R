@@ -61,7 +61,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
   defaults <- list(runOpts=runOpts)
   theResults <- NA
 
-  runTALYS <- function(inpSpecList, outSpec, runOpts=NULL, saveDir=NULL) {
+  runTALYS <- function(inpSpecList, outSpec, runOpts=NULL, saveDir=NULL, calcsPerJob) {
+    # the arguement calcsPerJob is deprecated
 
     if (!is.list(inpSpecList) || !all(sapply(inpSpecList, is.list)))
       stop("inpSpecList must be a list of TALYS inputs")
@@ -237,7 +238,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       runStatus
   }
 
-  splitJob <- function(inpSpecList, outSpec, runOpts=NULL, saveDir=NULL) {
+  splitJob <- function(inpSpecList, outSpec, runOpts=NULL, saveDir=NULL, calcsPerJob) {
+    # the arguement calcsPerJob is deprecated
     if (!is.list(inpSpecList) || !all(sapply(inpSpecList, is.list)))
       stop("inpSpecList must be a list of TALYS inputs")
     if (!is.data.table(outSpec) && !(is.list(outSpec) &&
@@ -272,8 +274,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       # scripts for both the present clusterTALYSmpi and the original clusterTALYS codes.
       # All that is needed is to change the TalysHnd in the config file
 
-      resultList
+      unlist(theResults,recursive=FALSE)
   }
 
-  list(run=splitJob,result=getResults,isRunning=isRunningTALYS,close=close)
+  list(run=splitJob,result=getResults,isRunning=isRunningTALYS)
 }
