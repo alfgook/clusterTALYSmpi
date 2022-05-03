@@ -13,6 +13,7 @@ void initalize_mpi(int *number_of_workers) {
    printf("number_of_workers = %d\n",*number_of_workers);
    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
    MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &number_of_workers, &flag);
+   *number_of_workers = *number_of_workers;
    printf("number_of_workers = %d\n",*number_of_workers);
 }
 
