@@ -38,11 +38,20 @@
 #' @useDynLib clusterTALYSmpi finalize_mpi
 #' @useDynLib clusterTALYSmpi start_mpi_workers
 
-initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=1048576) {
+initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 
   # will need to resolve this, should not have to specify a complete path to the .so file
   #dyn.load(paste0("/home/alf/programs/talys-mpi/runTALYSmpi/start_mpi_workers", .Platform$dynlib.ext))
-  .C("initalize_mpi")
+  maxNumWorkers <- maxNumCPU
+  .C("initalize_mpi",as.integer(maxNumWorkers))
+  print("--maxNumWorkers--")
+  print(maxNumWorkers)
+  print("-----------------")
+  if( maxNumCPU > 0 ) {
+    maxNumCPU <- min(maxNumWorkers,maxNumCPU)
+  } else {
+    maxNumCPU <- maxNumWorkers
+  }
 
   close <- function(env) {
     .C("finalize_mpi")
@@ -208,8 +217,9 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=104857
     unlink(basedir, recursive=TRUE)
 
     setwd(base_wd)
-    theResults <<- resultList
-    jobList
+    resultList
+    #theResults <<- resultList
+    #jobList
 
     # it would make more sense, and be simpler to just return the result here,
     # but to be compatible with Georgs clusterTalys.R the result will be returned
@@ -252,22 +262,22 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=104857
       if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<maxNumCPU ) ) { # single job
         print("single job")
         #jobList <- runTALYS(inpSpecList,outSpec,runOpts=runOpts, saveDir=saveDir)
-        jobList <- runTALYS(inpSpecList,outSpec)
+        resultList <- runTALYS(inpSpecList,outSpec)
       } else if (is.list(outSpec)) {
         # split requested calculations into several jobs
         print("split job")
         InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
         outChunks <- split(outSpec, ceiling(seq_along(outSpec)/maxNumCPU))
-        jobList <- replicate(length(InpChunks),NULL,simplify=FALSE)
+        resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
           #jobList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts)
-          jobList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]])
+          resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]])
         }
       } else {
         stop("should not happen")
       }
 
-      jobList
+      theResults <<- resultList
   }
 
   list(run=splitJob,result=getResults,isRunning=isRunningTALYS,close=close)

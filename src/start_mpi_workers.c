@@ -5,9 +5,13 @@
 
 #define MIN(x,y) ((x<y)?x:y)
 
-int initalize_mpi() {
+int initalize_mpi(int *number_of_workers) {
+   int world_size,flag;
+
    MPI_Init(NULL, NULL);
    printf("mpi session initalized\n");
+   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+   MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, number_of_workers, &flag);
    return 0;
 }
 
@@ -61,8 +65,13 @@ int start_mpi_workers(const char **worker_program ,
       return 1;
    }
 
-   nbr_of_workers = MIN(nbr_of_workers,universe_size-1);
-   nbr_of_workers = MIN(nbr_of_workers,nbr_of_jobs);
+   if(nbr_of_workers>0) {
+      nbr_of_workers = MIN(nbr_of_workers,universe_size-1);
+      nbr_of_workers = MIN(nbr_of_workers,nbr_of_jobs);
+   } else {
+      nbr_of_workers = MIN(universe_size-1,nbr_of_jobs);
+   }
+   
    //printf("nbr_of_workers = %d\n",nbr_of_workers);
    //printf("nbr_of_jobs = %d\n",nbr_of_jobs);
    //printf("universe_size = %d\n",universe_size);
