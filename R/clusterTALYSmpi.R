@@ -273,6 +273,10 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       print("----length(outspec)----------")
       print(length(outSpec))
       print("-----------------------------")
+      
+      print("----length(inpSpecList)----------")
+      print(length(inpSpecList))
+      print("-----------------------------")
 
       #if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<maxNumCPU ) ) { # single job
       if (is.data.table(outSpec) ) { # single job
