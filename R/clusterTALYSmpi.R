@@ -223,9 +223,9 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
     print(is.data.table(theResults))
     print("-----------------")
 
-    #if(length(theResults)==1) {
-    #  return(theResults)
-    #}
+    if(length(theResults)==1) {
+      return(theResults)
+    }
 
     if(isTRUE(selection)) {
       unlist(theResults,recursive=FALSE)
@@ -264,7 +264,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 
       if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<maxNumCPU ) ) { # single job
         #resultList <- runTALYS(inpSpecList,outSpec,runOpts=runOpts, saveDir=saveDir)
-        resultList[[1]] <- runTALYS(inpSpecList,outSpec)
+        resultList <- runTALYS(inpSpecList,outSpec)
       } else if (is.list(outSpec)) {
         # split requested calculations into several jobs
         InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
