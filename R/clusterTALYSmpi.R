@@ -223,6 +223,10 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
     print(is.data.table(theResults))
     print("-----------------")
 
+    if(length(theResults)==1) {
+      return(theResults)
+    }
+
     if(isTRUE(selection)) {
       unlist(theResults,recursive=FALSE)
     }
