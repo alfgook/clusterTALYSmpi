@@ -212,7 +212,13 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
   }
 
   getResults <- function(jobList, selection=TRUE) {
-    return(theResults)
+    
+    stopifnot(isTRUE(selection == TRUE) || is.numeric(selection))
+
+    if(isTRUE(selection)) {
+      unlist(theResults)
+    }
+
   }
 
   isRunningTALYS <- function(jobList,combine=TRUE) {
