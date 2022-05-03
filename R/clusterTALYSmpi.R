@@ -42,15 +42,14 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 
   # will need to resolve this, should not have to specify a complete path to the .so file
   #dyn.load(paste0("/home/alf/programs/talys-mpi/runTALYSmpi/start_mpi_workers", .Platform$dynlib.ext))
-  #maxNumWorkers <- maxNumCPU
-  val=.C("initalize_mpi",maxNumWorkers = as.integer(maxNumCPU))
+  retval=.C("initalize_mpi",maxNumWorkers = as.integer(maxNumCPU))
   print("--maxNumWorkers--")
-  print(val$maxNumWorkers)
+  print(retval$maxNumWorkers)
   print("-----------------")
   if( maxNumCPU > 0 ) {
-    maxNumCPU <- min(maxNumWorkers,maxNumCPU)
+    maxNumCPU <- min(retval$maxNumWorkers,maxNumCPU)
   } else {
-    maxNumCPU <- maxNumWorkers
+    maxNumCPU <- retval$maxNumWorkers
   }
 
   close <- function(env) {
