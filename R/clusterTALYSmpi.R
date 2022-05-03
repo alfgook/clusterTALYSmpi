@@ -45,7 +45,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
   maxNumWorkers <- maxNumCPU
   .C("initalize_mpi",as.integer(maxNumWorkers))
   print("--maxNumWorkers--")
-  print(maxNumWorkers)
+  print($maxNumWorkers)
   print("-----------------")
   if( maxNumCPU > 0 ) {
     maxNumCPU <- min(maxNumWorkers,maxNumCPU)
