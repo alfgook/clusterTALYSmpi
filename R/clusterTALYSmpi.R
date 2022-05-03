@@ -75,8 +75,6 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
     library(TALYSeval)
     library(data.table)
 
-    print("runTALYS")
-
     # error handling
     stackvarname <- paste0("stackinfo_",paste0(sample(letters, 10), collapse=""))
     conditionFun <- function(cond) {
@@ -245,17 +243,15 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       if (is.null(runOpts)) runOpts <- defaults$runOpts
 
       if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<maxNumCPU ) ) { # single job
-        print("single job")
-        #jobList <- runTALYS(inpSpecList,outSpec,runOpts=runOpts, saveDir=saveDir)
+        #resultList <- runTALYS(inpSpecList,outSpec,runOpts=runOpts, saveDir=saveDir)
         resultList <- runTALYS(inpSpecList,outSpec)
       } else if (is.list(outSpec)) {
         # split requested calculations into several jobs
-        print("split job")
         InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
         outChunks <- split(outSpec, ceiling(seq_along(outSpec)/maxNumCPU))
         resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
-          #jobList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts)
+          #resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts, saveDir=saveDir)
           resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]])
         }
       } else {

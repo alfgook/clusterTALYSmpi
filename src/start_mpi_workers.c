@@ -10,11 +10,9 @@ void initalize_mpi(int *number_of_workers) {
 
    MPI_Init(NULL, NULL);
    printf("mpi session initalized\n");
-   printf("number_of_workers = %d\n",*number_of_workers);
    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
    MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &universe_sizep, &flag);
    *number_of_workers = *universe_sizep - 1;
-   printf("number_of_workers = %d\n",*number_of_workers);
 }
 
 void finalize_mpi() {
