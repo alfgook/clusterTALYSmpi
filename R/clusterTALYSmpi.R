@@ -216,9 +216,15 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
     
     stopifnot(isTRUE(selection == TRUE) || is.numeric(selection))
 
+    if(is.data.table(theResults)) {
+      return(theResults)
+    }
+
     if(isTRUE(selection)) {
       unlist(theResults,recursive=FALSE)
     }
+
+    #the selection of results should also be added?
 
   }
 
