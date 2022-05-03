@@ -270,36 +270,29 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 
       if (is.null(runOpts)) runOpts <- defaults$runOpts
 
+      print("----length(outspec)----------")
+      print(length(outSpec))
+      print("-----------------------------")
+
       #if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<maxNumCPU ) ) { # single job
-#      if (is.data.table(outSpec) ) { # single job
-#        print("--- single job ----")
-#        #resultList <- runTALYS(inpSpecList,outSpec,runOpts=runOpts, saveDir=saveDir)
-#        resultList <- runTALYS(inpSpecList,outSpec)
-#      } else if (is.list(outSpec)) {
-#        print("--- splitting job ----")
-#        # split requested calculations into several jobs
-#        InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
-#        outChunks <- split(outSpec, ceiling(seq_along(outSpec)/maxNumCPU))
-#        resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
-#        for (jobIdx in seq_along(InpChunks)) {
-#          #resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts, saveDir=saveDir)
-#          resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]])
-#        }
-#      } else {
-#        stop("should not happen")
-#      }
-
-      if(is.data.table(outSpec)) print("is.data.table(outSpec)")
-
-      print("--- splitting job ----")
-      # split requested calculations into several jobs
-      InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
-      outChunks <- split(outSpec, ceiling(seq_along(outSpec)/maxNumCPU))
-      resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
-      for (jobIdx in seq_along(InpChunks)) {
-        #resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts, saveDir=saveDir)
-        resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]])
+      if (is.data.table(outSpec) ) { # single job
+        print("--- single job ----")
+        #resultList <- runTALYS(inpSpecList,outSpec,runOpts=runOpts, saveDir=saveDir)
+        resultList <- runTALYS(inpSpecList,outSpec)
+      } else if (is.list(outSpec)) {
+        print("--- splitting job ----")
+        # split requested calculations into several jobs
+        InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
+        outChunks <- split(outSpec, ceiling(seq_along(outSpec)/maxNumCPU))
+        resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
+        for (jobIdx in seq_along(InpChunks)) {
+          #resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts, saveDir=saveDir)
+          resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]])
+        }
+      } else {
+        stop("should not happen")
       }
+
       theResults <<- resultList
 
       # it would make more sense, and be simpler to just return the result here,
