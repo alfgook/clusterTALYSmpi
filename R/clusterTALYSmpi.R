@@ -216,24 +216,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
     
     stopifnot(isTRUE(selection == TRUE) || is.numeric(selection))
 
-    print("length(theResults)")
-    print(length(theResults))
-    print("-----------------")
-    print("is.data.table(theResults)")
-    print(is.data.table(theResults))
-    print("-----------------")
-    print("selection")
-    print(selection)
-    print("-----------------")
-
-    if(length(theResults)==1) {
-      return(theResults)
-    }
-
     if(isTRUE(selection)) {
-      for (item in theResults) {
-        print(item$result)
-      }
       unlist(theResults,recursive=FALSE)
     }
 
@@ -278,11 +261,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       print("-----------------------------")
 
       #if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<maxNumCPU ) ) { # single job
-      if (is.data.table(outSpec) && length(inpSpecList)==1) { # single job
-        print("--- single job ----")
-        #resultList <- runTALYS(inpSpecList,outSpec,runOpts=runOpts, saveDir=saveDir)
-        resultList <- runTALYS(inpSpecList,outSpec)
-      } else if (is.data.table(outSpec)) {
+      if (is.data.table(outSpec)) {
         print("--- splitting job 1 ----")
         InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
         #outChunks <- as.list(rep(outSpec, length(InpChunks)))
