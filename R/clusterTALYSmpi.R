@@ -292,7 +292,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       # scripts for both the present clusterTALYSmpi and the original clusterTALYS codes.
       # All that is needed is to change the TalysHnd in the config file
 
-      unlist(theResults,recursive=FALSE)
+      #unlist(theResults,recursive=FALSE)
   }
 
   list(run=splitJob,result=getResults,isRunning=isRunningTALYS)
