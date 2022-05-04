@@ -252,17 +252,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 
       if (is.null(runOpts)) runOpts <- defaults$runOpts
 
-      print("----length(outspec)----------")
-      print(length(outSpec))
-      print("-----------------------------")
-
-      print("----length(inpSpecList)----------")
-      print(length(inpSpecList))
-      print("-----------------------------")
-
       #if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<maxNumCPU ) ) { # single job
       if (is.data.table(outSpec)) {
-        print("--- splitting job 1 ----")
         InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
         #outChunks <- as.list(rep(outSpec, length(InpChunks)))
         resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
@@ -271,7 +262,6 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
           resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outSpec)
         }
       } else if (is.list(outSpec)) {
-        print("--- splitting job ----")
         # split requested calculations into several jobs
         InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
         outChunks <- split(outSpec, ceiling(seq_along(outSpec)/maxNumCPU))
@@ -292,7 +282,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       # scripts for both the present clusterTALYSmpi and the original clusterTALYS codes.
       # All that is needed is to change the TalysHnd in the config file
 
-      #unlist(theResults,recursive=FALSE)
+      unlist(theResults,recursive=FALSE)
   }
 
   list(run=splitJob,result=getResults,isRunning=isRunningTALYS)
