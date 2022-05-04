@@ -240,7 +240,6 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
   }
 
   splitJob <- function(inpSpecList, outSpec, runOpts=NULL, saveDir=NULL, calcsPerJob) {
-    print("--- splitJob ----")
     # the arguement calcsPerJob is deprecated
     if (!is.list(inpSpecList) || !all(sapply(inpSpecList, is.list)))
       stop("inpSpecList must be a list of TALYS inputs")
@@ -252,13 +251,11 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 
       if (is.null(runOpts)) runOpts <- defaults$runOpts
 
-      #if (is.data.table(outSpec) || ( is.list(outSpec) && length(outSpec)<maxNumCPU ) ) { # single job
       if (is.data.table(outSpec)) {
         InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
         #outChunks <- as.list(rep(outSpec, length(InpChunks)))
         resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
-          #resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts, saveDir=saveDir)
           resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outSpec)
         }
       } else if (is.list(outSpec)) {
@@ -267,11 +264,10 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
         outChunks <- split(outSpec, ceiling(seq_along(outSpec)/maxNumCPU))
         resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
-          #resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts, saveDir=saveDir)
           resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]])
         }
       } else {
-        stop("should not happen")
+        stop("outSpec is neither a data.table nor a list of data.tables.")
       }
 
       theResults <<- resultList
