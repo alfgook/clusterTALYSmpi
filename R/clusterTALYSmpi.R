@@ -283,12 +283,13 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
         #resultList <- runTALYS(inpSpecList,outSpec,runOpts=runOpts, saveDir=saveDir)
         resultList <- runTALYS(inpSpecList,outSpec)
       } else if (is.data.table(outSpec)) {
+        print("--- splitting job 1 ----")
         InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
-        outChunks <- as.list(rep(outSpec, length(InpChunks)))
+        #outChunks <- as.list(rep(outSpec, length(InpChunks)))
         resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
           #resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts, saveDir=saveDir)
-          resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]])
+          resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outSpec)
         }
       } else if (is.list(outSpec)) {
         print("--- splitting job ----")
