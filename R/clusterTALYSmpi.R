@@ -256,7 +256,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
         #outChunks <- as.list(rep(outSpec, length(InpChunks)))
         resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
-          resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outSpec)
+          resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outSpec,runOpts=runOpts,saveDir=saveDir)
         }
       } else if (is.list(outSpec)) {
         # split requested calculations into several jobs
@@ -264,7 +264,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
         outChunks <- split(outSpec, ceiling(seq_along(outSpec)/maxNumCPU))
         resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
-          resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]])
+          resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outChunks[[jobIdx]],runOpts=runOpts,saveDir=saveDir)
         }
       } else {
         stop("outSpec is neither a data.table nor a list of data.tables.")

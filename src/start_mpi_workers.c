@@ -95,6 +95,7 @@ void start_mpi_workers(const char **worker_program ,
    MPI_Info_set(info,"wdir",bin_path[0]);
    // apparently I can only have one value for wdir, so it needs to be known at compile time
 
+   printf("spawning %d workers...\n",nbr_of_workers);
    MPI_Comm_spawn(worker_program[0],
                      argv,
                      nbr_of_workers,
@@ -103,16 +104,6 @@ void start_mpi_workers(const char **worker_program ,
                      MPI_COMM_SELF,
                      &everyone,
                      MPI_ERRCODES_IGNORE);
-
-
-   /*MPI_Comm_spawn(worker_program[0],
-                     argv,
-                     nbr_of_workers,
-                     MPI_INFO_NULL, 
-                     0,
-                     MPI_COMM_SELF,
-                     &everyone,
-                     MPI_ERRCODES_IGNORE);*/
    
    // Could add parallel code here. The communicator "everyone" can be used to communicate with
    // the spawned processes, which have ranks 0,.. nbr_of_workers-1 in the remote group of 
@@ -120,7 +111,7 @@ void start_mpi_workers(const char **worker_program ,
    // I need to add a wait for the workers to finish thier tasks here!!!
    //MPI_Barrier(everyone);
 
-   printf("%d workers spawned... waiting...\n",nbr_of_workers);
+   printf("...waiting...\n");
    for(int worker=0;worker<nbr_of_workers;worker++) {
       int rank;
       MPI_Recv(&rank, 1, MPI_INT, worker, 0, everyone, MPI_STATUS_IGNORE);
