@@ -97,12 +97,12 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       # create the temporary directory for the current calculation
       cnt <- 0
       succ <- FALSE
-      while (!succ && (cnt<-cnt+1) < 10) {
+      while (!succ && (cnt<-cnt+1) < 100) {
         proposedDirname <- sprintf("tmpcalc_%s", paste0(sample(letters,10),collapse=""))
         proposedPathname <- file.path(globalTempdir, proposedDirname)
         succ <- dir.create(proposedPathname, showWarnings = FALSE)
       }
-      if (!succ) stop(paste0("unable to create temporary directory in ", globalTempdir))
+      if (!succ) stop(paste0("unable to create temporary directory ",proposedPathname," in ", globalTempdir))
       basedir <- proposedPathname
       
       curInp <- input[[jobIdx]]$input
@@ -186,7 +186,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       unlink(input[[jobIdx]]$calcDir, recursive=TRUE)
     }
     # delete the temporary calculation directory
-    unlink(basedir, recursive=TRUE)
+    # unlink(basedir, recursive=TRUE)
 
     setwd(base_wd)
     resultList
