@@ -176,9 +176,9 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
         saveFilePath <- file.path(curSaveDir, tarfile)
         tarcmd <- paste0('tar -czf ', tarfile,' *')
         movecmd <- paste0('rsync --remove-source-files -av ', tarfile, ' ', saveFilePath)
-        if (system(tarcmd, intern=FALSE) != 0)
+        if (system(tarcmd, intern=FALSE, wait=TRUE) != 0)
           stop(paste0("Problem with: ", tarcmd))
-        if (system(movecmd, intern=FALSE) != 0)
+        if (system(movecmd, intern=FALSE, wait=TRUE) != 0)
           stop(paste0("Problem with: ", movecmd))
       }
 
