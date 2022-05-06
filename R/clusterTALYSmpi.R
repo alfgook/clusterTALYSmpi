@@ -61,16 +61,8 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
   defaults <- list(runOpts=runOpts)
   theResults <- NA
 
-  runTALYS <- function(inpSpecList, outSpec, runOpts=NULL, saveDir=NULL, calcsPerJob) {
+  runTALYS <- function(input, outSpec, runOpts=NULL, saveDir=NULL, calcsPerJob) {
     # the arguement calcsPerJob is deprecated
-
-    if (!is.list(inpSpecList) || !all(sapply(inpSpecList, is.list)))
-      stop("inpSpecList must be a list of TALYS inputs")
-    if (!is.data.table(outSpec) && !(is.list(outSpec) &&
-                                    all(sapply(outSpec, is.data.table)) &&
-                                    length(inpSpecList) == length(outSpec)))
-      stop(paste0("outSpec must be either a datatable or ",
-                  "a list of datatables of the same length as inpSpecList"))
 
     library(digest)
     library(TALYSeval)
@@ -91,18 +83,6 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 
     if (is.null(runOpts))
       runOpts <- defaults$runOpts
-
-    if (is.data.table(outSpec))
-      input <- lapply(seq_along(inpSpecList),function(i)
-        list(input=inpSpecList[[i]], outspec=outSpec,saveDir=saveDir, calcIdx=i, calcDir=""))
-    else if (is.list(outSpec))
-    {
-      input <- mapply(function(i, x, y) {
-        list(input=x, outspec=y, saveDir = saveDir, calcIdx=i, calcDir="")
-      }, i=seq_along(inpSpecList), x=inpSpecList, y=outSpec, SIMPLIFY = FALSE)
-    }
-    else
-      stop("should not happen")
 
     jobList <- replicate(length(input),NULL,simplify=FALSE)
     talysMod <- createModelTALYS()
@@ -253,15 +233,23 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
 
       if (is.data.table(outSpec)) {
         # all calculations have the same output specification (outSpec)
-        InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
+        input <- lapply(seq_along(inpSpecList),function(i)
+          list(input=inpSpecList[[i]], outspec=outSpec,saveDir=saveDir, calcIdx=i, calcDir=""))
+
+        InpChunks <- split(input, ceiling(seq_along(input)/maxNumCPU))
         resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
           resultList[[jobIdx]] <- runTALYS(InpChunks[[jobIdx]],outSpec,runOpts=runOpts,saveDir=saveDir)
         }
+
       } else if (is.list(outSpec)) {
         # each calculation have a unique output specification (outSpec)
         stopifnot(length(inpSpecList)==length(outSpec))
-        InpChunks <- split(inpSpecList, ceiling(seq_along(inpSpecList)/maxNumCPU))
+        input <- mapply(function(i, x, y) {
+          list(input=x, outspec=y, saveDir = saveDir, calcIdx=i, calcDir="")
+        }, i=seq_along(inpSpecList), x=inpSpecList, y=outSpec, SIMPLIFY = FALSE)
+
+        InpChunks <- split(input, ceiling(seq_along(input)/maxNumCPU))
         outChunks <- split(outSpec, ceiling(seq_along(outSpec)/maxNumCPU))
         resultList <- replicate(length(InpChunks),NULL,simplify=FALSE)
         for (jobIdx in seq_along(InpChunks)) {
