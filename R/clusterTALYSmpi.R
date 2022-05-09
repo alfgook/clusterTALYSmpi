@@ -100,7 +100,7 @@ initClusterTALYSmpi <- function(talysExe="talys", runOpts=NULL, maxNumCPU=0) {
       while (!succ && (cnt<-cnt+1) < 100) {
         proposedDirname <- sprintf("tmpcalc_%s", paste0(sample(letters,10),collapse=""))
         proposedPathname <- file.path(globalTempdir, proposedDirname)
-        print(paste0("proposedPathname = ",proposedPathname," cnt = ",cnt))
+        #print(paste0("proposedPathname = ",proposedPathname,", cnt = ",cnt))
         succ <- dir.create(proposedPathname, showWarnings = FALSE)
       }
       if (!succ) stop(paste0("unable to create temporary directory ",proposedPathname," in ", globalTempdir))
